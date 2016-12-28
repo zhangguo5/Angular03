@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<!--指定angular管理的范围-->
+<html ng-app="carApp">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>服务</title>
+	</head>
+
+	<body>
+		<!--指定控制器的作用范围-->
+		<form ng-controller="CarController" name="form1">
+			<h2>汽车管理</h2>
+			<table border="1" width="100%">
+				<tr>
+					<th>序列</th>
+					<th>编号</th>
+					<th>名称</th>
+					<th>价格</th>
+					<th>颜色</th>
+					<th>速度</th>
+					<th>操作</th>
+				</tr>
+				<tr ng-repeat="car in cars">
+					<td>{{$index+1}}</td>
+					<td>{{car.id}}</td>
+					<td>{{car.name}}</td>
+					<td>{{car.price}}</td>
+					<td>{{car.color}}</td>
+					<td>{{car.speed}}</td>
+					<td>
+						<a href="#" ng-click="del(car.id)">删除</a>
+						<a href="#" ng-click="edit(car.id)">编辑</a>
+					</td>
+				</tr>
+			</table>
+			<br />
+			<fieldset>
+				<legend>汽车详细</legend>
+				<p>
+					<label for="id">编号</label>
+					<input ng-model="car.id" id="id" ng-readonly="true"/>
+				</p>
+				<p>
+					<label for="name">名称</label>
+					<input ng-model="car.name" id="name" />
+				</p>
+				<p>
+					<label for="price">价格</label>
+					<input ng-model="car.price" id="price" />
+				</p>
+				<p>
+					<label for="color">颜色</label>
+					<input ng-model="car.color" id="color" />
+				</p>
+				<p>
+					<label for="color">速度</label>
+					<input ng-model="car.speed" id="speed" />
+				</p>
+				<button ng-click="add()">添加</button>
+			</fieldset>
+		</form>
+
+		<!--引入angularjs框架-->
+		<script src="js/angular146/angular.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			//定义模块，指定依赖项为空
+			var carApp = angular.module("carApp", []);
+
+			//定义控制器，指定控制器的名称，$scope是全局对象
+			carApp.controller("CarController", ['$scope', '$http', function($scope, $http) {
+				$scope.cars = [];
+				$scope.add=function()
+				{
+					console.log($scope.car+"test");
+					$http.post("http://127.0.0.1:3000/cars/car",$scope.car,{"method":"POST"})
+					.success(function(data, status, headers, config) {
+						$scope.cars.push(data);
+					})
+					.error(function(data, status, headers, config) {
+						alert(status);
+					});
+				}
+				
+				$http.get("http://127.0.0.1:3000/cars")
+					.success(function(data, status, headers, config) {
+						$scope.cars = data;
+					})
+					.error(function(data, status, headers, config) {
+						alert(status);
+				});
+
+				$scope.del=function(id){
+					$http.delete("http://127.0.0.1:3000/cars/id/"+id)
+						.success(function(data, status, headers, config) {
+							$scope.cars = data;
+						})
+						.error(function(data, status, headers, config) {
+							alert(status);
+						});
+				}
+			}]);
+		</script>
+	</body>
+
+</html>
